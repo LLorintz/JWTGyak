@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from './AuthProvider';
 
 export const LoginForm: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+ const {login,isAuthenticated} = useAuth()
 
   const handleLogin = async () => {
     try {
@@ -19,7 +20,7 @@ export const LoginForm: React.FC = () => {
 
       const data = await response.json();
       if (data.success) {
-        localStorage.setItem('jwtToken', data.token);
+        login(data.token)
         alert('Bejelentkezés sikeres, token elmentve.');
       }
      
@@ -27,6 +28,14 @@ export const LoginForm: React.FC = () => {
       alert('Hiba történt: ' + error);
     }
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token && !isAuthenticated) {
+      login(token);
+      
+    }
+  }, [isAuthenticated, login]);
 
   return (
     <div>
